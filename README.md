@@ -8,7 +8,7 @@ FaucK is a [Chugin](https://github.com/ccrma/chugins) that combines the powerful
 
 You must install [cmake](https://cmake.org/download/) and [git](https://git-scm.com/downloads) so that they're accessible in Terminal/cmd prompts.
 
-### Cheaders
+You may need to execute `git submodule update --init --recursive` in the `fauck` directory to make sure all submodules are cloned.
 
 Clone the [ChucK headers](https://github.com/ccrma/cheaders) so that they're a sibling of the fauck project directory.
 
