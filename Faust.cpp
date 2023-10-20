@@ -33,7 +33,6 @@
 #include <map>
 #include <fstream>
 //#include <filesystem>
-using namespace std;
 
 // faust include
 #include "faust/dsp/llvm-dsp.h"
@@ -92,7 +91,7 @@ t_CKINT faust_data_offset = 0;
   #define FAUSTFLOAT float
 #endif
 
-list<GUI*> GUI::fGuiList;
+std::list<GUI*> GUI::fGuiList;
 ztimedmap GUI::gTimedZoneMap;
 static int numCompiled = 0;
 
@@ -154,7 +153,7 @@ std::string getPathToFaustLibraries() {
   try {
 #ifdef WIN32
     const std::wstring ws_shareFaustDir = MyDLLDir + L"\\faustlibraries";
-    // std::cerr << "MyDLLDir: ";
+    // std::std::cerr << "MyDLLDir: ";
     // std::wcerr << MyDLLDir << L'\n';
     // convert const wchar_t to char
     // https://stackoverflow.com/a/4387335
@@ -186,10 +185,10 @@ std::string getPathToFaustLibraries() {
 #else
     // this applies to __APPLE__ and LINUX
     const char* myDLLPath = getMyDLLPath();
-    // std::cerr << "myDLLPath: " << myDLLPath << std::endl;
+    // std::std::cerr << "myDLLPath: " << myDLLPath << std::std::endl;
     //std::filesystem::path p = std::filesystem::path(myDLLPath);
     //p = p.parent_path() / "faustlibraries";
-    //std::cerr << "p.string(): " << p.string() << endl;
+    //std::std::cerr << "p.string(): " << p.string() << std::endl;
     //return p.string();
     return "";
 #endif
@@ -206,10 +205,10 @@ class FauckUI : public UI, public PathBuilder
 {
 protected:
     // name to pointer map
-    map<string, FAUSTFLOAT*> fZoneMap;
+    std::map<std::string, FAUSTFLOAT*> fZoneMap;
     
     // insert into map
-    void insertMap( string label, FAUSTFLOAT * zone )
+    void insertMap( std::string label, FAUSTFLOAT * zone )
     {
         // map
         fZoneMap[label] = zone;
@@ -280,18 +279,18 @@ public:
     {}
     
     // set/get
-    void setValue( const string& path, FAUSTFLOAT value )
+    void setValue( const std::string& path, FAUSTFLOAT value )
     {
         // append "/chuck/" if necessary
-        string p = path.length() > 0 && path[0] == '/' ? path : string("/chuck/")+path;
+        std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/chuck/")+path;
 
         // TODO: should check if path valid?
         if( fZoneMap.find(p) == fZoneMap.end() )
         {
             // error
-            cerr << "[Faust]: cannot set parameter named: " << path;
-            if( path != p ) cerr << " OR " << p << endl;
-            else cerr << endl;
+            std::cerr << "[Faust]: cannot set parameter named: " << path;
+            if( path != p ) std::cerr << " OR " << p << std::endl;
+            else std::cerr << std::endl;
             return;
         }
         
@@ -299,18 +298,18 @@ public:
         *fZoneMap[p] = value;
     }
     
-    float getValue(const string& path)
+    float getValue(const std::string& path)
     {
         // append "/0x00/" if necessary
-        string p = path.length() > 0 && path[0] == '/' ? path : string("/0x00/")+path;
+        std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/0x00/")+path;
 
         // TODO: should check if path valid?
         if( fZoneMap.find(p) == fZoneMap.end() )
         {
             // error
-            cerr << "[Faust]: cannot get parameter named: " << path;
-            if( path != p ) cerr << " OR " << p << endl;
-            else cerr << endl;
+            std::cerr << "[Faust]: cannot get parameter named: " << path;
+            if( path != p ) std::cerr << " OR " << p << std::endl;
+            else std::cerr << std::endl;
             return 0;
         }
         
@@ -320,23 +319,23 @@ public:
     void dumpParams()
     {
         // iterator
-        map<string, FAUSTFLOAT*>::iterator iter = fZoneMap.begin();
+        std::map<std::string, FAUSTFLOAT*>::iterator iter = fZoneMap.begin();
         // go
         for( ; iter != fZoneMap.end(); iter++ )
         {
             // print
-            cerr << iter->first << " : " << *(iter->second) << endl;
+            std::cerr << iter->first << " : " << *(iter->second) << std::endl;
         }
     }
     
     // map access
-    map<string, FAUSTFLOAT*>& getMap() { return fZoneMap; }
+    std::map<std::string, FAUSTFLOAT*>& getMap() { return fZoneMap; }
     // get map size
     int getParamsCount() { return fZoneMap.size(); }
     // get param path
-    string getParamPath(int index)
+    std::string getParamPath(int index)
     {
-        map<string, FAUSTFLOAT*>::iterator it = fZoneMap.begin();
+        std::map<std::string, FAUSTFLOAT*>::iterator it = fZoneMap.begin();
         while (index-- > 0 && it++ != fZoneMap.end()) {}
         return (*it).first;
     }
@@ -371,8 +370,8 @@ public:
         // auto import
         m_autoImport = "// Faust Chugin auto import:\n \
         import(\"stdfaust.lib\");\n";
-        m_assetsDirPath = string("");
-        m_faustLibrariesPath = string("");
+        m_assetsDirPath = std::string("");
+        m_faustLibrariesPath = std::string("");
         
         clearMIDI();
     }
@@ -390,7 +389,7 @@ public:
     }
     
     int setNVoices(int nvoices) {
-        nvoices = max(0, nvoices);
+        nvoices = std::max(0, nvoices);
         m_nvoices = nvoices;
         return m_nvoices;
     }
@@ -418,11 +417,11 @@ public:
         }
     }
     
-    void setAssetsDir(const string & assetsDir) {
+    void setAssetsDir(const std::string & assetsDir) {
         m_assetsDirPath = assetsDir;
     }
     
-    void setLibrariesDir(const string & librariesDir) {
+    void setLibrariesDir(const std::string & librariesDir) {
         m_faustLibrariesPath = librariesDir;
     }
     
@@ -511,8 +510,8 @@ public:
         clearBufs();
         
         // set
-        m_numInputChannels = min(inputChannels, MAX_INPUTS);
-        m_numOutputChannels = min(outputChannels, MAX_OUTPUTS);
+        m_numInputChannels = std::min(inputChannels, MAX_INPUTS);
+        m_numOutputChannels = std::min(outputChannels, MAX_OUTPUTS);
 
         // allocate channels
         m_input = new FAUSTFLOAT *[m_numInputChannels];
@@ -531,7 +530,7 @@ public:
     }
     
     // eval
-    bool eval( const string & code )
+    bool eval( const std::string & code )
     {
         // clean up
         clear();
@@ -559,15 +558,15 @@ public:
         m_code = code;
         
         // auto import
-        string theCode = m_autoImport + "\n" + code;
+        std::string theCode = m_autoImport + "\n" + code;
         
         // optimization level
         const int optimize = -1;
         
 #if __APPLE__
-    string target = getDSPMachineTarget();
+    std::string target = getDSPMachineTarget();
 #else
-    string target = string("");
+    std::string target = std::string("");
 #endif
         
         const bool polyphonyIsOn = m_nvoices > 0;
@@ -579,7 +578,7 @@ public:
         } else {
             // create new factory
             m_factory = createDSPFactoryFromString("chuck", theCode,
-                argc, argv, target, m_errorString, optimize );
+                argc, argv, target, m_errorString, optimize);
         }
         
         if (argv) {
@@ -593,7 +592,7 @@ public:
         if( m_errorString != "")
         {
             // output error
-            cerr << "[Faust]: " << m_errorString << endl;
+            std::cerr << "[Faust]: " << m_errorString << std::endl;
             // clear
             clear();
             // done
@@ -602,14 +601,14 @@ public:
         
         //// print where faustlib is looking for stdfaust.lib and the other lib files.
         //auto pathnames = m_factory->getIncludePathnames();
-        //cout << "pathnames:\n" << endl;
+        //std::cout << "pathnames:\n" << std::endl;
         //for (auto name : pathnames) {
-        //    cout << name << "\n" << endl;
+        //    std::cout << name << "\n" << std::endl;
         //}
-        //cout << "library list:\n" << endl;
+        //std::cout << "library list:\n" << std::endl;
         //auto librarylist = m_factory->getLibraryList();
         //for (auto name : librarylist) {
-        //    cout << name << "\n" << endl;
+        //    std::cout << name << "\n" << std::endl;
         //}
 
     #if __APPLE__
@@ -623,7 +622,7 @@ public:
         if (polyphonyIsOn) {
             m_dsp_poly = m_poly_factory->createPolyDSPInstance(m_nvoices, m_dynamicVoices, m_groupVoices);
             if (!m_dsp_poly) {
-                cerr << "[Faust]: Cannot create Poly DSP instance." << endl;
+                std::cerr << "[Faust]: Cannot create Poly DSP instance." << std::endl;
                 return false;
             }
             if (m_midi_enable) {
@@ -634,7 +633,7 @@ public:
             // create DSP instance
             m_dsp = m_factory->createDSPInstance();
             if (!m_dsp) {
-                cerr << "[Faust]: Cannot create DSP instance." << endl;
+                std::cerr << "[Faust]: Cannot create DSP instance." << std::endl;
                 return false;
             }
         }
@@ -679,22 +678,22 @@ public:
     }
 
     // compile
-    bool compile( const string & path )
+    bool compile( const std::string & path )
     {
         // open file
-        ifstream fin( path.c_str() );
+        std::ifstream fin( path.c_str() );
         // check
         if( !fin.good() )
         {
             // error
-            cerr << "[Faust]: ERROR opening file: '" << path << "'" << endl;
+            std::cerr << "[Faust]: ERROR opening file: '" << path << "'" << std::endl;
             return false;
         }
         
         // clear code string
         m_code = "";
         // get it
-        for( string line; getline( fin, line ); )
+        for( std::string line; getline( fin, line ); )
             m_code += line + '\n';
         
         // eval it
@@ -705,13 +704,13 @@ public:
     void dump()
     {
         if(m_errorString.empty()){
-        cerr << "---------------- DUMPING [Faust] PARAMETERS ---------------" << endl;
+        std::cerr << "---------------- DUMPING [Faust] PARAMETERS ---------------" << std::endl;
         m_ui->dumpParams();
-        cerr << "Number of Inputs: " << m_numInputChannels << endl ;
-        cerr << "Number of Outputs: " << m_numOutputChannels << endl ;
-        cerr << "-----------------------------------------------------------" << endl;
+        std::cerr << "Number of Inputs: " << m_numInputChannels << std::endl ;
+        std::cerr << "Number of Outputs: " << m_numOutputChannels << std::endl ;
+        std::cerr << "-----------------------------------------------------------" << std::endl;
         } else{
-        cerr << "[Faust]: "<< m_errorString <<endl;
+        std::cerr << "[Faust]: "<< m_errorString <<std::endl;
         }
     }
     
@@ -786,7 +785,7 @@ public:
     */
 
     // set parameter example
-    t_CKFLOAT setParam( const string & n, t_CKFLOAT p )
+    t_CKFLOAT setParam( const std::string & n, t_CKFLOAT p )
     {
         // sanity check
         if( !m_ui ) return 0;
@@ -799,17 +798,17 @@ public:
     }
 
     // get parameter example
-    t_CKFLOAT getParam( const string & n )
+    t_CKFLOAT getParam( const std::string & n )
     { return m_ui->getValue(n); }
     
     // get code
-    string code() { return m_code; }
+    std::string code() { return m_code; }
 
 private:
     // sample rate
     t_CKFLOAT m_srate;
     // code text (pre any modifications)
-    string m_code;
+    std::string m_code;
     // llvm factory
     llvm_dsp_factory * m_factory;
     llvm_dsp_poly_factory* m_poly_factory;
@@ -817,11 +816,11 @@ private:
     dsp * m_dsp;
     dsp_poly* m_dsp_poly;
     // faust compiler error string
-    string m_errorString;
+    std::string m_errorString;
     // auto import
-    string m_autoImport;
-    string m_faustLibrariesPath;
-    string m_assetsDirPath;
+    std::string m_autoImport;
+    std::string m_faustLibrariesPath;
+    std::string m_assetsDirPath;
     
     // faust input buffer
     FAUSTFLOAT ** m_input;
@@ -844,7 +843,7 @@ private:
 
     bool m_midi_enable = false;
     bool m_midi_virtual = false;
-    string m_midi_virtual_name = string("");
+    std::string m_midi_virtual_name = std::string("");
     rt_midi m_midi_handler;
 };
 
@@ -1028,7 +1027,7 @@ CK_DLL_MFUN(faust_eval)
     // get our c++ class pointer
     Faust * f = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get argument
-    string code = GET_NEXT_STRING_SAFE(ARGS);
+    std::string code = GET_NEXT_STRING_SAFE(ARGS);
     // eval it
     RETURN->v_int = f->eval( code );
 }
@@ -1038,7 +1037,7 @@ CK_DLL_MFUN(faust_compile)
     // get our c++ class pointer
     Faust * f = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get argument
-    string code = GET_NEXT_STRING_SAFE(ARGS);
+    std::string code = GET_NEXT_STRING_SAFE(ARGS);
     // eval it
     RETURN->v_int = f->compile( code );
 }
@@ -1048,7 +1047,7 @@ CK_DLL_MFUN(faust_v_set)
     // get our c++ class pointer
     Faust * f = (Faust *)OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get name
-    string name = GET_NEXT_STRING_SAFE(ARGS);
+    std::string name = GET_NEXT_STRING_SAFE(ARGS);
     // get value
     t_CKFLOAT v = GET_NEXT_FLOAT(ARGS);
     // call it
@@ -1062,7 +1061,7 @@ CK_DLL_MFUN(faust_v_get)
     // get our c++ class pointer
     Faust * f = (Faust *)OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get name
-    string name = GET_NEXT_STRING_SAFE(ARGS);
+    std::string name = GET_NEXT_STRING_SAFE(ARGS);
     // call it
     RETURN->v_float = f->getParam( name );
 }
@@ -1158,7 +1157,7 @@ CK_DLL_MFUN(faust_assets_set)
     // get our c++ class pointer
     Faust * f = (Faust *)OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get value
-    string v = GET_NEXT_STRING_SAFE(ARGS);
+    std::string v = GET_NEXT_STRING_SAFE(ARGS);
     // call it
     f->setAssetsDir( v );
     // return it
@@ -1170,7 +1169,7 @@ CK_DLL_MFUN(faust_libraries_set)
     // get our c++ class pointer
     Faust * f = (Faust *)OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get value
-    string v = GET_NEXT_STRING_SAFE(ARGS);
+    std::string v = GET_NEXT_STRING_SAFE(ARGS);
     // call it
     f->setLibrariesDir( v );
     // return it
