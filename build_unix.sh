@@ -16,7 +16,7 @@ cmake --build build --target install
 cd ../..
 
 # Build FaucK
-cmake -Bbuild $CMAKEOPTS -DLIBFAUST_DIR="$LIBFAUST_DIR" -DCMAKE_PREFIX_PATH="thirdparty/libsndfile/install"
+cmake -Bbuild $CMAKEOPTS -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_VERBOSE_MAKEFILE=ON -DLIBFAUST_DIR="$LIBFAUST_DIR" -DCMAKE_PREFIX_PATH="thirdparty/libsndfile/install"
 cmake --build build --config Release
 cmake --build build --config Release --target install
 
