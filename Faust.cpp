@@ -575,11 +575,11 @@ public:
         if (polyphonyIsOn) {
             // create new factory
             m_poly_factory = createPolyDSPFactoryFromString("chuck", theCode,
-                argc, argv, target.c_str(), m_errorString, optimize);
+                argc, argv, target, m_errorString, optimize);
         } else {
             // create new factory
             m_factory = createDSPFactoryFromString("chuck", theCode,
-                argc, argv, target.c_str(), m_errorString, optimize );
+                argc, argv, target, m_errorString, optimize );
         }
         
         if (argv) {
