@@ -86,8 +86,8 @@ else()
     # We expect the user to have used brew to install the dependencies
     # for libsndfile, to have built libsndfile as a static lib,
     # and for it to be accessible via `pkg-config --static libsndfile`.
-    set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
     if(APPLE)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
     list(APPEND PKG_CONFIG_EXECUTABLE "--static")  # append temporarily
     endif()
     pkg_check_modules(SNDFILE REQUIRED IMPORTED_TARGET sndfile)
