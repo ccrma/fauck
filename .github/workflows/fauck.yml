@@ -68,7 +68,7 @@ jobs:
     - name: Build Libsndfile
       run: |
         cd thirdparty/libsndfile
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="./install"
+        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="./install"
         cmake --build build --config Release
         cmake --build build --target install
 
