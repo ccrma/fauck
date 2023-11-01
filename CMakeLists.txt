@@ -87,7 +87,9 @@ else()
     # for libsndfile, to have built libsndfile as a static lib,
     # and for it to be accessible via `pkg-config --static libsndfile`.
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    if(APPLE)
     list(APPEND PKG_CONFIG_EXECUTABLE "--static")  # append temporarily
+    endif()
     pkg_check_modules(SNDFILE REQUIRED IMPORTED_TARGET sndfile)
     pkg_check_modules(FLAC REQUIRED IMPORTED_TARGET flac)
     pkg_check_modules(VORBIS REQUIRED IMPORTED_TARGET vorbis)
@@ -96,14 +98,8 @@ else()
     pkg_check_modules(MPG123 REQUIRED IMPORTED_TARGET libmpg123)
     if(APPLE)
     execute_process(COMMAND find /usr/local/Cellar/lame -name libmp3lame.a OUTPUT_VARIABLE SNDFILE_STATIC_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
-    else()
-    # todo: skip mp3 support on linux because it doesn't work on github actions. error:
-    # 2023-11-01T03:45:30.2513717Z /usr/bin/c++ -fPIC -shared  -o libFaust.chug CMakeFiles/FaucK.dir/Faust.cpp.o   -L/home/runner/work/fauck/fauck/thirdparty/libfaust/ubuntu-x86_64/Release/lib  -Wl,-rpath,/home/runner/work/fauck/fauck/thirdparty/libfaust/ubuntu-x86_64/Release/lib: -Wl,-Bstatic -lfaustwithllvm -Wl,-Bdynamic /home/runner/work/fauck/fauck/thirdparty/libsndfile/install/lib/libsndfile.a /usr/lib/x86_64-linux-gnu/libmp3lame.a /usr/lib/x86_64-linux-gnu/libvorbisenc.a /usr/lib/x86_64-linux-gnu/libFLAC.a /usr/lib/x86_64-linux-gnu/libvorbis.a /usr/lib/x86_64-linux-gnu/libogg.a /usr/lib/x86_64-linux-gnu/libopus.a /usr/lib/x86_64-linux-gnu/libm.a -lmpg123 
-    # 2023-11-01T03:45:34.7801415Z /usr/bin/ld: /usr/lib/x86_64-linux-gnu/libmp3lame.a(VbrTag.o): relocation R_X86_64_PC32 against symbol `bitrate_table' can not be used when making a shared object; recompile with -fPIC
-    # 2023-11-01T03:45:34.7803232Z /usr/bin/ld: final link failed: bad value
-    # execute_process(COMMAND find /usr/local -name libmp3lame.a OUTPUT_VARIABLE SNDFILE_STATIC_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
-    endif()
     list(POP_BACK PKG_CONFIG_EXECUTABLE)  # undo the append above
+    endif()
     target_link_libraries (${PROJECT_NAME} PRIVATE PkgConfig::SNDFILE PkgConfig::FLAC PkgConfig::VORBIS PkgConfig::OGG PkgConfig::OPUS PkgConfig::MPG123 ${SNDFILE_STATIC_LIBS})
 endif()
 
