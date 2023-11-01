@@ -117,7 +117,7 @@ if (NOT LIBFAUST_DIR)
     elseif(APPLE)
     set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/darwin-x64/Release")
     else()
-    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x64/Release")
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x86_64/Release")
     endif()
 endif()
 
