@@ -21,8 +21,8 @@
 #endif
 
 // this should align with the correct versions of these ChucK files
-#include "chuck_dl.h"
-#include "chuck_def.h"
+#include <chuck_dl.h>
+#include <chuck_def.h>
 
 // general includes
 #include <stdio.h>
@@ -35,24 +35,24 @@
 //#include <filesystem>
 
 // faust include
-#include "faust/dsp/llvm-dsp.h"
-#include "faust/dsp/proxy-dsp.h"
-#include "faust/dsp/poly-llvm-dsp.h"
-#include "faust/dsp/poly-interpreter-dsp.h"
+#include <faust/dsp/llvm-dsp.h>
+#include <faust/dsp/proxy-dsp.h>
+#include <faust/dsp/poly-llvm-dsp.h>
+#include <faust/dsp/poly-interpreter-dsp.h>
 
-#include "faust/gui/meta.h"
-#include "faust/gui/FUI.h"
-#include "faust/gui/MidiUI.h"
-#include "faust/gui/UI.h"
-#include "faust/gui/PathBuilder.h"
-#include "faust/gui/GUI.h"
-//#include "faust/gui/JSONUI.h"
-#include "faust/gui/SoundUI.h"
+#include <faust/gui/meta.h>
+#include <faust/gui/FUI.h>
+#include <faust/gui/MidiUI.h>
+#include <faust/gui/UI.h>
+#include <faust/gui/PathBuilder.h>
+#include <faust/gui/GUI.h>
+//#include <faust/gui/JSONUI.h>
+#include <faust/gui/SoundUI.h>
 
-#include "faust/midi/rt-midi.h"
-#include "faust/midi/RtMidi.cpp"
+#include <faust/midi/rt-midi.h>
+#include <faust/midi/RtMidi.cpp>
 
-#include "TMutex.h"
+#include <TMutex.h>
 
 // declaration of chugin constructor
 CK_DLL_CTOR(faust_ctor);

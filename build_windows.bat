@@ -9,6 +9,5 @@ if not exist "thirdparty/libsndfile-1.2.0-win64/" (
 	cd ..
 )
 
-cmake -Bbuild -DLIBFAUST_DIR="thirdparty/libfaust/win64/Release"
 cmake --build build --config Release
 cmake --build build --config Release --target install

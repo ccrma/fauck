@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.13.0 FATAL_ERROR)
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (DEFINED ENV{FAUCK_VERSION})
+set (VERSION $ENV{FAUCK_VERSION})
+else()
 set (VERSION "0.0.1")
+endif()
 
 project(FaucK VERSION ${VERSION})
 
@@ -10,7 +14,7 @@ project(FaucK VERSION ${VERSION})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT FaucK)
 
 # Collect ChucK sources
-FILE(GLOB CK_SOURCES ${PROJECT_SOURCE_DIR}/../cheaders/include/*.h)
+FILE(GLOB CK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cheaders/include/*.h)
 source_group("ChucK" FILES ${CK_SOURCES})
 
 # Collect FaucK sources
@@ -47,6 +51,7 @@ install ( TARGETS FaucK
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_compile_options(-fPIC)
 
 if(APPLE)
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -76,6 +81,7 @@ if (MSVC)
     find_package(SndFile REQUIRED HINTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libsndfile-1.2.0-win64/cmake")
     target_link_libraries(${PROJECT_NAME} PRIVATE SndFile::sndfile)
 else()
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libsndfile/install")
     find_package(PkgConfig REQUIRED)
     # We expect the user to have used brew to install the dependencies
     # for libsndfile, to have built libsndfile as a static lib,
@@ -104,7 +110,16 @@ endif()
 include_directories(${FAUST_DIR}/architecture)
 include_directories(${FAUST_DIR}/compiler)
 include_directories(${FAUST_DIR}/compiler/utils)
-unset(FAUST_DIR CACHE)
+
+if (NOT LIBFAUST_DIR)
+    if(MSVC)
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/win64/Release")
+    elseif(APPLE)
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/darwin-x64/Release")
+    else()
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x64/Release")
+    endif()
+endif()
 
 # Link libfaust based on platform
 target_link_directories(${PROJECT_NAME} PRIVATE ${LIBFAUST_DIR}/lib)
@@ -114,22 +129,38 @@ else()
 target_link_libraries(${PROJECT_NAME} PRIVATE libfaustwithllvm.a)
 endif()
 
+unset(FAUST_DIR CACHE)
+unset(LIBFAUST_DIR CACHE)
+
 # Platform-specific libraries and definitions
 if(APPLE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE "__MACOSX_CORE__;__APPLE__;__PLATFORM_APPLE__")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        __MACOSX_CORE__
+        __APPLE__
+        __PLATFORM_APPLE__
+    )
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 elseif(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 winmm wsock32 dsound dinput8 dxguid)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE "WIN32;_WIN32;_WINDOWS;NOMINMAX;_USRDLL;__WINDOWS_DS__;__PLATFORM_WINDOWS__")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        WIN32
+        _WIN32
+        _WINDOWS
+        NOMINMAX
+        _USRDLL
+        __WINDOWS_DS__
+        __PLATFORM_WINDOWS__
+    )
 else()
-    target_compile_definitions(${PROJECT_NAME} PRIVATE "__PLATFORM_LINUX__")
-    # target_link_libraries(${PROJECT_NAME} PUBLIC "stdc++fs")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+        _GLIBCXX_USE_CXX11_ABI=0
+        __PLATFORM_LINUX__
+        )
 endif()
 
 # MSVC-specific options
 if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>$<$<CONFIG:Release>:NDEBUG>")
-    # target_compile_options(${PROJECT_NAME} PRIVATE "/W3;/Zi;${DEFAULT_CXX_EXCEPTION_HANDLING}")
     target_link_options(${PROJECT_NAME} PRIVATE "/DEBUG;/SUBSYSTEM:WINDOWS;/INCREMENTAL:NO")
 endif()
 
@@ -141,7 +172,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 # Include directories
 target_include_directories(FaucK PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../cheaders/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cheaders/include>
     $<INSTALL_INTERFACE:FaucK> )
 
 if (WIN32)
