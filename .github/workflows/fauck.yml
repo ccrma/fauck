@@ -1,7 +1,7 @@
 name: FaucK
 
 env:
-  FAUCK_VERSION: 0.0.1
+  FAUCK_VERSION: 0.0.2
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -74,7 +74,7 @@ jobs:
 
     - name: Build FaucK Release
       run: |
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DFAUCK_VERSION="${{ env.FAUCK_VERSION }}"
+        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON
         cmake --build build --config Release
         cmake --build build --config Release --target install
 
