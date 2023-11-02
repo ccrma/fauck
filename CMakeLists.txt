@@ -32,10 +32,29 @@ set(ALL_FILES
 
 #######################################
 # faust libraries
-file (GLOB DSPLIBS ${LIBFAUST_DIR}/share/faust/*.lib)
+
+# Include directories for libfaust
+if(NOT FAUST_DIR)
+    set(FAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/faust")
+endif()
+include_directories(${FAUST_DIR}/architecture)
+include_directories(${FAUST_DIR}/compiler)
+include_directories(${FAUST_DIR}/compiler/utils)
+
+if (NOT LIBFAUST_DIR)
+    if(MSVC)
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/win64/Release")
+    elseif(APPLE)
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/darwin-x64/Release")
+    else()
+    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x86_64/Release")
+    endif()
+endif()
+
+set(FAUST_LIBRARIES_DIR ${LIBFAUST_DIR}/share/faust)
 
 # Create shared library
-add_library(FaucK MODULE ${ALL_FILES} ${DSPLIBS})
+add_library(FaucK MODULE ${ALL_FILES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
@@ -59,19 +78,26 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE TRUE
     BUNDLE_EXTENSION chug
     OUTPUT_NAME Faust
-    RESOURCE "${DSPLIBS}"
     MACOSX_BUNDLE_GUI_IDENTIFIER edu.stanford.chuck.${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Info.plist
 )
+install(
+    DIRECTORY ${FAUST_LIBRARIES_DIR}
+    DESTINATION ${PACKDIR}/${DST}/Faust.chug/Contents/Resources
+    FILES_MATCHING PATTERN "*.*"
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)
 else()
 set_target_properties (${PROJECT_NAME} PROPERTIES 
     SUFFIX ".chug"
     OUTPUT_NAME Faust)
-install (
-    FILES ${DSPLIBS} DESTINATION ${PACKDIR}/${DST}/faustlibraries
+install(
+    DIRECTORY ${FAUST_LIBRARIES_DIR}
+    DESTINATION ${PACKDIR}/${DST}
+    FILES_MATCHING PATTERN "*.*"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
 )
 endif()
@@ -101,24 +127,6 @@ else()
     list(POP_BACK PKG_CONFIG_EXECUTABLE)  # undo the append above
     endif()
     target_link_libraries (${PROJECT_NAME} PRIVATE PkgConfig::SNDFILE PkgConfig::FLAC PkgConfig::VORBIS PkgConfig::OGG PkgConfig::OPUS PkgConfig::MPG123 ${SNDFILE_STATIC_LIBS})
-endif()
-
-# Include directories for libfaust
-if(NOT FAUST_DIR)
-    set(FAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/faust")
-endif()
-include_directories(${FAUST_DIR}/architecture)
-include_directories(${FAUST_DIR}/compiler)
-include_directories(${FAUST_DIR}/compiler/utils)
-
-if (NOT LIBFAUST_DIR)
-    if(MSVC)
-    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/win64/Release")
-    elseif(APPLE)
-    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/darwin-x64/Release")
-    else()
-    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x86_64/Release")
-    endif()
 endif()
 
 # Link libfaust based on platform

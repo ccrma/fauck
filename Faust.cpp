@@ -152,7 +152,7 @@ std::string getPathToFaustLibraries() {
 
   try {
 #ifdef WIN32
-    const std::wstring ws_shareFaustDir = MyDLLDir + L"\\faustlibraries";
+    const std::wstring ws_shareFaustDir = MyDLLDir + L"\\faust";
     // std::std::cerr << "MyDLLDir: ";
     // std::wcerr << MyDLLDir << L'\n';
     // convert const wchar_t to char
@@ -168,7 +168,7 @@ std::string getPathToFaustLibraries() {
     delete[] char_shareFaustDir;
     return p;
 #elif __APPLE__
-	  // look for faustlibraries inside the bundle
+    // look for faustlibraries inside the bundle
     // OSX only : access to the Faust bundle
     CFBundleRef fauck_bundle = CFBundleGetBundleWithIdentifier(
         CFSTR("edu.stanford.chuck.FaucK"));
@@ -180,17 +180,14 @@ std::string getPathToFaustLibraries() {
 
     // Built the complete resource path
     std::string resourcePath = std::string((const char*)bundle_path) +
-                    std::string("/Contents/Resources/");
+                    std::string("/Contents/Resources/faust");
     return resourcePath;
 #else
-    // this applies to __APPLE__ and LINUX
+    // this applies to Linux
     const char* myDLLPath = getMyDLLPath();
-    // std::std::cerr << "myDLLPath: " << myDLLPath << std::std::endl;
-    //std::filesystem::path p = std::filesystem::path(myDLLPath);
-    //p = p.parent_path() / "faustlibraries";
-    //std::std::cerr << "p.string(): " << p.string() << std::endl;
-    //return p.string();
-    return "";
+    std::filesystem::path p = std::filesystem::path(myDLLPath);
+    p = p.parent_path() / "faust";
+    return p.string();
 #endif
   } catch (...) {
     throw std::runtime_error("Error getting path to faustlibraries.");
