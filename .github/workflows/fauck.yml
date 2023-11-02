@@ -74,7 +74,7 @@ jobs:
 
     - name: Build FaucK Release
       run: |
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DFAUCK_VERSION=${{ env.FAUCK_VERSION }}
+        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DFAUCK_VERSION="${{ env.FAUCK_VERSION }}"
         cmake --build build --config Release
         cmake --build build --config Release --target install
 
