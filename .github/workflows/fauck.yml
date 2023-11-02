@@ -61,12 +61,12 @@ jobs:
         call download_libfaust.bat
   
     - name: Download Libfaust macOS/Linux
-      if: startsWith(matrix.os, 'ubuntu')
+      if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
       run: |
         cd thirdparty/libfaust && sh download_libfaust.sh
 
     - name: Build Libsndfile
-      if: startsWith(matrix.os, 'windows') == false
+      if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
       run: |
         cd thirdparty/libsndfile
         cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="./install"
