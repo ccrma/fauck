@@ -34,19 +34,19 @@ jobs:
         submodules: true
 
     - name: Install dependencies ubuntu
-      if: matrix.os == 'ubuntu-20.04'
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt install autoconf autogen automake build-essential libasound2-dev \
         libflac-dev libogg-dev libtool libvorbis-dev libopus-dev libmp3lame-dev \
         libmpg123-dev pkg-config python
 
     - name: Install dependencies macOS
-      if: matrix.os == 'macos-11'
+      if: startsWith(matrix.os, 'macos')
       run: |
         brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 pkg-config
 
     - name: Install dependencies Windows
-      if: matrix.os == 'windows-2022'
+      if: startsWith(matrix.os, 'windows')
       run: |
         cd thirdparty
         curl -OL https://github.com/libsndfile/libsndfile/releases/download/1.2.0/libsndfile-1.2.0-win64.zip
@@ -54,14 +54,14 @@ jobs:
         rm libsndfile-1.2.0-win64.zip
 
     - name: Download Libfaust Windows
-      if: matrix.os == 'windows-2022'
+      if: startsWith(matrix.os, 'windows')
       shell: cmd
       run: |
         cd thirdparty/libfaust
         call download_libfaust.bat
   
     - name: Download Libfaust macOS/Linux
-      if: matrix.os != 'windows-2022'
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         cd thirdparty/libfaust && sh download_libfaust.sh
 
