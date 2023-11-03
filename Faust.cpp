@@ -32,8 +32,9 @@
 #include <vector>
 #include <map>
 #include <fstream>
-//#include <filesystem>
-
+#if __PLATFORM_LINUX__
+#include <filesystem>
+#endif
 // faust include
 #include <faust/dsp/llvm-dsp.h>
 #include <faust/dsp/proxy-dsp.h>
@@ -185,7 +186,7 @@ std::string getPathToFaustLibraries() {
 #else
     // this applies to Linux
     const char* myDLLPath = getMyDLLPath();
-    std::filesystem::path p = std::filesystem::path(myDLLPath).parent() / "faust";
+    std::filesystem::path p = std::filesystem::path(myDLLPath).parent_path() / "faust";
     return p.string();
 #endif
   } catch (...) {
