@@ -87,7 +87,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 install(
     DIRECTORY ${FAUST_LIBRARIES_DIR}
     DESTINATION ${PACKDIR}/${DST}/Faust.chug/Contents/Resources
-    FILES_MATCHING PATTERN "*.*"
+    PATTERN "*.lproj" EXCLUDE
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
 )
 else()

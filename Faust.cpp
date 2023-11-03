@@ -185,8 +185,7 @@ std::string getPathToFaustLibraries() {
 #else
     // this applies to Linux
     const char* myDLLPath = getMyDLLPath();
-    std::filesystem::path p = std::filesystem::path(myDLLPath);
-    p = p.parent_path() / "faust";
+    std::filesystem::path p = std::filesystem::path(myDLLPath).parent() / "faust";
     return p.string();
 #endif
   } catch (...) {
