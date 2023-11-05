@@ -85,8 +85,8 @@ jobs:
 
     - name: Build FaucK Release
       run: |
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON
-        cmake --build build --config Release -DLIBFAUST_DIR=${{ github.workspace }}/${{ matrix.LIBFAUST_DIR }} -DCMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }}
+        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DLIBFAUST_DIR=${{ github.workspace }}/${{ matrix.LIBFAUST_DIR }} -DCMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }}
+        cmake --build build --config Release
         cmake --build build --config Release --target install
 
     - uses: actions/upload-artifact@v3
