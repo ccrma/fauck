@@ -9,5 +9,6 @@ if not exist "thirdparty/libsndfile-1.2.0-win64/" (
 	cd ..
 )
 
+rem Build FaucK
 cmake --build build --config Release
 cmake --build build --config Release --target install

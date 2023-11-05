@@ -10,8 +10,6 @@ You must install [cmake](https://cmake.org/download/) and [git](https://git-scm.
 
 You may need to execute `git submodule update --init --recursive` in the `fauck` directory to make sure all submodules are cloned.
 
-Clone the [ChucK headers](https://github.com/ccrma/cheaders) so that they're a sibling of the fauck project directory.
-
 ### Libsndfile
 
 On Windows, the later scripts will automatically download `libsndfile`, so no action is needed.
@@ -26,10 +24,6 @@ sudo apt install autoconf autogen automake build-essential libasound2-dev \
 libflac-dev libogg-dev libtool libvorbis-dev libopus-dev libmp3lame-dev \
 libmpg123-dev pkg-config python
 ```
-
-### Faust
-
-If you need to update the version of Faust, you should update the Faust checkout version in `build_unix.sh`/`build_windows.bat` as well as the version number in the download scripts (`thirdparty/libfaust/download*`).
 
 ### Building FaucK
 
@@ -47,7 +41,7 @@ Navigate to the `package` directory and find the latest `fauck` version such as 
 
 On macOS, you should expect to see a `Faust.chug` directory. Copy it to `usr/local/lib/chuck`.
 
-On Linux you should see `Faust.chug` and a `faustlibraries` sibling. Copy both as siblings to `usr/local/lib/chuck`.
+On Linux you should see `Faust.chug`. Copy it to the chugins directory. Also download `https://github.com/grame-cncm/faustlibraries` next to the Faust.chug and name it `faust`.
 
 Then run chuck with a FaucK example.
 
@@ -62,7 +56,7 @@ Navigate to `thirdparty/libfaust`. Run `call download_libfaust.bat` in an cmd pr
 
 Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to this README, and run `call build_windows.bat`.
 
-Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`). Next, copy `faustlibraries` and `Faust.chug` to `%USERPROFILE%/Documents/ChucK/chugins`.
+Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`). Next, copy `faust` and `Faust.chug` to `%USERPROFILE%/Documents/ChucK/chugins`.
 
 Then run chuck with a FaucK example.
 
@@ -142,3 +136,7 @@ Examples can be found in the [examples](https://github.com/ccrma/chugins/tree/ma
 
 * Check out the 2016 SMC paper on FaucK: Ge Wang and Romain Michon, *FaucK!! Hybridizing the Faust and ChucK Audio Programming Languages*
 * For other questions, feel free to e-mail Romain Michon: rmichon_AT_ccrma_DOT_stanford_DOT_edu or David Braun: braun_AT_ccrma_DOT_stanford_DOT_edu.
+
+## Note to FaucK maintainers
+
+If you need to update the version of Faust, you should update the Faust version number in the download scripts (`thirdparty/libfaust/download*`). Then you should make sure `thirdparty/faust` is checked out to that version tag.

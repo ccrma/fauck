@@ -6,7 +6,6 @@ cmake --build build --target install
 cd ../..
 
 # Build FaucK
-#  -DCMAKE_PREFIX_PATH="thirdparty/libsndfile/install"
 cmake -Bbuild $CMAKEOPTS -DCMAKE_VERBOSE_MAKEFILE=ON
 cmake --build build --config Release
 cmake --build build --config Release --target install
