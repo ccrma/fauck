@@ -32,6 +32,7 @@ libmpg123-dev pkg-config python
 macOS Requirements:
 
 * macOS version 11.0 or higher (due to Libfaust)
+* Xcode and Xcode Command Line Tools
 
 Navigate to `thirdparty/libfaust` and run `sh download_libfaust.sh` in Terminal.
 
@@ -134,7 +135,7 @@ Examples can be found in the [examples](https://github.com/ccrma/chugins/tree/ma
 
 ## Other Resources
 
-* Check out the 2016 SMC paper on FaucK: Ge Wang and Romain Michon, *FaucK!! Hybridizing the Faust and ChucK Audio Programming Languages*
+* Check out the 2016 SMC paper on FaucK: Ge Wang and Romain Michon, [FaucK!! Hybridizing the Faust and ChucK Audio Programming Languages](https://ccrma.stanford.edu/~rmichon/publications/doc/SMC16-fauck.pdf)
 * For other questions, feel free to e-mail Romain Michon: rmichon_AT_ccrma_DOT_stanford_DOT_edu or David Braun: braun_AT_ccrma_DOT_stanford_DOT_edu.
 
 ## Note to FaucK maintainers
