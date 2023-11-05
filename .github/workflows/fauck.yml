@@ -21,10 +21,20 @@ jobs:
         include:
           - name: ubuntu-x86_64
             os: ubuntu-20.04
+            LIBFAUST_DIR: thirdparty/libfaust/ubuntu-x86_64/Release
+            CMAKE_OSX_ARCHITECTURES: "x86_64"
           - name: macos-x86_64
             os: macos-11
+            LIBFAUST_DIR: thirdparty/libfaust/darwin-x64/Release
+            CMAKE_OSX_ARCHITECTURES: "x86_64"
+          # - name: macos-arm64
+          #   os: macos-11
+          #   LIBFAUST_DIR: thirdparty/libfaust/darwin-arm64/Release
+          #   CMAKE_OSX_ARCHITECTURES: "arm64"
           - name: win64
             os: windows-2022
+            LIBFAUST_DIR: thirdparty/libfaust/win64/Release
+            CMAKE_OSX_ARCHITECTURES: "x86_64"
 
     runs-on: ${{ matrix.os }}
 
@@ -76,7 +86,7 @@ jobs:
     - name: Build FaucK Release
       run: |
         cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON
-        cmake --build build --config Release
+        cmake --build build --config Release -DLIBFAUST_DIR=${{ github.workspace }}/${{ matrix.LIBFAUST_DIR }} -DCMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }}
         cmake --build build --config Release --target install
 
     - uses: actions/upload-artifact@v3
