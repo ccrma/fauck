@@ -34,18 +34,18 @@ set(ALL_FILES
 # faust libraries
 
 # Include directories for libfaust
-if(NOT FAUST_DIR)
+if (NOT DEFINED FAUST_DIR)
     set(FAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/faust")
 endif()
 include_directories(${FAUST_DIR}/architecture)
 include_directories(${FAUST_DIR}/compiler)
 include_directories(${FAUST_DIR}/compiler/utils)
 
-if (NOT LIBFAUST_DIR)
+if (NOT DEFINED LIBFAUST_DIR)
     if(MSVC)
     set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/win64/Release")
     elseif(APPLE)
-    set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/darwin-x64/Release")
+    message( FATAL_ERROR "LIBFAUST_DIR must be set on macOS." )
     else()
     set(LIBFAUST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libfaust/ubuntu-x86_64/Release")
     endif()
