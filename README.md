@@ -131,7 +131,7 @@ A Faust Chugin has the following functions:
 
 ## Examples
 
-Examples can be found in the [examples](https://github.com/ccrma/chugins/tree/master/Faust/examples) folder of the FaucK distribution. You can debug why the Faust.chugin may not be loading with `chuck --verbose:10 --level:10 crybaby.ck` or any other FaucK example.
+Examples can be found in the [examples](https://github.com/ccrma/chugins/tree/master/Faust/examples) folder of the FaucK distribution. You can debug why the Faust.chug may not be loading with `chuck -v3 crybaby.ck` or any other FaucK example.
 
 ## Other Resources
 
