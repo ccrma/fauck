@@ -11,17 +11,17 @@
 	<key>CFBundleIdentifier</key>
 	<string>edu.stanford.chuck.FaucK</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>0.0.1</string>
+	<string>0.0.3</string>
 	<key>CFBundleLongVersionString</key>
-	<string>FaucK 0.0.1, Copyright 2023 Stanford CCRMA</string>
+	<string>FaucK 0.0.3, Copyright 2023 Stanford CCRMA</string>
 	<key>CFBundlePackageType</key>
 	<string>iLaX</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.1</string>
+	<string>0.0.3</string>
 	<key>CFBundleSignature</key>
 	<string>max2</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.1</string>
+	<string>0.0.3</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 </dict>
