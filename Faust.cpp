@@ -845,6 +845,21 @@ private:
 
 
 //-----------------------------------------------------------------------------
+// info function: ChucK calls this when loading/probing the chugin
+// NOTE: please customize these info fields below; they will be used for
+// chugins loading, probing, and package management and documentation
+//-----------------------------------------------------------------------------
+CK_DLL_INFO( Faust )
+{
+    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "v0.0.1" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Ge Wang, Romain Michon, David Braun" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A chugin which dynamically compiles and executes FAUST code via LLVM." );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_URL, "https://github.com/ccrma/fauck" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_EMAIL, "braun@ccrma.stanford.edu" );
+}
+
+
+//-----------------------------------------------------------------------------
 // query function: chuck calls this when loading the Chugin
 // NOTE: developer will need to modify this function to
 // add additional functions to this Chugin
@@ -865,10 +880,6 @@ CK_DLL_QUERY( Faust )
     
     // for UGen's only: add tick function
     QUERY->add_ugen_funcf(QUERY, faust_tickf, NULL, MAX_INPUTS, MAX_OUTPUTS);
-    
-    // NOTE: if this is to be a UGen with more than 1 channel, 
-    // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
-    // and declare a tickf function using CK_DLL_TICKF
 
     // add .eval()
     QUERY->add_mfun(QUERY, faust_eval, "int", "eval");
@@ -984,35 +995,32 @@ CK_DLL_CTOR(faust_ctor)
     OBJ_MEMBER_INT(SELF, faust_data_offset) = 0;
     
     // instantiate our internal c++ class representation
-    Faust * f_obj = new Faust(API->vm->srate(VM));
+    Faust * faust_obj = new Faust(API->vm->srate(VM));
     
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT(SELF, faust_data_offset) = (t_CKINT) f_obj;
+    OBJ_MEMBER_INT(SELF, faust_data_offset) = (t_CKINT) faust_obj;
 }
 
 // implementation for the destructor
 CK_DLL_DTOR(faust_dtor)
 {
     // get our c++ class pointer
-    Faust * f_obj = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
-    // check it
-    if( f_obj )
-    {
-        // clean up
-        delete f_obj;
-        OBJ_MEMBER_INT(SELF, faust_data_offset) = 0;
-        f_obj = NULL;
-    }
+    Faust * faust_obj = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
+
+    // clean up (this macro tests for NULL, deletes, and zeros out the variable)
+    CK_SAFE_DELETE( faust_obj );
+    // set the data field to 0
+    OBJ_MEMBER_INT( SELF, faust_data_offset ) = 0;
 }
 
 // implementation for tick function
 CK_DLL_TICKF(faust_tickf)
 {
     // get our c++ class pointer
-    Faust * f_obj = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
+    Faust * faust_obj = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
  
     // invoke our tick function; store in the magical out variable
-    if(f_obj) f_obj->tick(in, out, nframes);
+    if(faust_obj) faust_obj->tick(in, out, nframes);
 
     // yes
     return TRUE;
