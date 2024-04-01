@@ -1,67 +1,71 @@
 # FaucK
 
-FaucK is a [Chugin](https://github.com/ccrma/chugins) that combines the powerful, succinct [Functional AUdio STream (Faust) language](http://faust.grame.fr) with the strongly-timed [ChucK](http://chuck.stanford.edu) audio programming language. FaucK allows programmers to evaluate Faust code on-the-fly inside ChucK and control Faust signal processors using ChucK’s sample-precise timing and concurrency mechanisms. The goal is to create an amalgam that plays to the strengths of each language, giving rise to new possibilities for rapid prototyping, interaction design and controller mapping, pedagogy, and new ways of working with both Faust and ChucK. 
+FaucK is a [Chugin](https://github.com/ccrma/chugins) that combines the powerful, succinct [Functional AUdio STream (Faust) language](http://faust.grame.fr) with the strongly-timed [ChucK](http://chuck.stanford.edu) audio programming language. FaucK allows programmers to evaluate Faust code on-the-fly inside ChucK and control Faust signal processors using ChucK’s sample-precise timing and concurrency mechanisms. The goal is to create an amalgam that plays to the strengths of each language, giving rise to new possibilities for rapid prototyping, interaction design and controller mapping, pedagogy, and new ways of working with both Faust and ChucK.
 
-## Compilation and Installation
+## Compilation requirements
 
-### Prerequisites for all platforms
-
-**After fauck is built, it must be used with ChucK 1.5.2.0 or newer.**
+### Compilation requirements for all platforms
 
 You must install [cmake](https://cmake.org/download/) and [git](https://git-scm.com/downloads) so that they're accessible in Terminal/cmd prompts.
 
 You may need to execute `git submodule update --init --recursive` in the `fauck` directory to make sure all submodules are cloned.
 
-### Libsndfile
+### macOS requirements
 
-On Windows, the later scripts will automatically download `libsndfile`, so no action is needed.
+* macOS version 12.0 or higher (due to Libfaust)
+* Xcode and Xcode Command Line Tools
 
-On macOS, install the dependencies for libsndfile with `brew`:
+Install the dependencies for libsndfile with `brew`:
 
-```brew install autoconf autogen automake flac lame libogg libtool libvorbis opus mpg123 pkg-config```
-
-On Linux:
+```bash
+brew install autoconf autogen automake flac lame libogg libtool libvorbis opus mpg123 pkg-config
 ```
+
+### Linux requirements
+
+Install the dependencies for libsndfile:
+```bash
 sudo apt install autoconf autogen automake build-essential libasound2-dev \
 libflac-dev libogg-dev libtool libvorbis-dev libopus-dev libmp3lame-dev \
 libmpg123-dev pkg-config python
 ```
 
-### Building FaucK
+### Windows requirements
 
-#### macOS/Linux
-
-macOS Requirements:
-
-* macOS version 11.0 or higher (due to Libfaust)
-* Xcode and Xcode Command Line Tools
-
-Navigate to `thirdparty/libfaust` and run `sh download_libfaust.sh` in Terminal.
-
-In a Terminal window, navigate to this README and run `sh build_unix.sh`.
-
-Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`.
-
-On macOS, you should expect to see a `Faust.chug` directory. Copy it to `usr/local/lib/chuck`.
-
-On Linux you should see `Faust.chug`. Copy it to the chugins directory. Also download `https://github.com/grame-cncm/faustlibraries` next to the Faust.chug and name it `faust`.
-
-Then run chuck with a FaucK example.
-
-#### Windows
-
+* 64-bit Windows, which you are almost certainly using.
 * [7z.exe](https://www.7-zip.org/download.html) must be in your system PATH.
 * You must have Visual Studio 2022 installed (due to Libfaust)
 
-Next, create a **permanent** environment variable `CHUCK_CHUGIN_PATH` and set it equal to `%USERPROFILE%/Documents/ChucK/chugins`.
+## Building FaucK
 
-Navigate to `thirdparty/libfaust`. Run `call download_libfaust.bat` in an cmd prompt.
+### macOS/Linux
 
-Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to this README, and run `call build_windows.bat`.
+In the root of this repository, run
 
-Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`). Next, copy `faust` and `Faust.chug` to `%USERPROFILE%/Documents/ChucK/chugins`.
+```bash
+make mac
+```
 
-Then run chuck with a FaucK example.
+Afterward, a `Faust.chug` directory will appear at `~/.chuck/lib/Faust.chug`.
+
+### Linux
+
+In the root of this repository, run
+
+```bash
+make linux
+```
+
+Afterward, a `Faust.chug` file will appear at `~/.chuck/lib/Faust.chug`. Next, download `https://github.com/grame-cncm/faustlibraries` next to the Faust.chug and name it `faust`.
+
+### Windows
+
+Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to this README, and run 
+```bash
+make win
+```
+
+Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`).
 
 ## Using FaucK
 
