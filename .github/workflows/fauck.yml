@@ -83,7 +83,10 @@ jobs:
 
     - name: Build FaucK Release
       run: |
-        CMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }} make ${{ matrix.os-simple }}
+        make ${{ matrix.os-simple }}
+      env:
+        CMAKE_OSX_ARCHITECTURES: ${{ matrix.CMAKE_OSX_ARCHITECTURES }}
+        LIBFAUST_DIR: ${{ matrix.LIBFAUST_DIR }}
 
     - uses: actions/upload-artifact@v4
       with:

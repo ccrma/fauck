@@ -14,12 +14,12 @@ UNAME_M := $(shell uname -m)
 # Set LIBFAUST_DIR based on OS and architecture
 ifeq ($(UNAME_S), Darwin)
     ifeq ($(UNAME_M), arm64)
-        LIBFAUST_DIR := $(PWD)/thirdparty/libfaust/darwin-arm64/Release
+        LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/darwin-arm64/Release
     else
-        LIBFAUST_DIR := $(PWD)/thirdparty/libfaust/darwin-x64/Release
+        LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/darwin-x64/Release
     endif
 else
-    LIBFAUST_DIR := $(PWD)/thirdparty/libfaust/ubuntu-x86_64/Release
+    LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/ubuntu-x86_64/Release
 endif
 
 CHUG=$(addsuffix $(CHUGIN_SUFFIX),$(CHUGIN_NAME))
