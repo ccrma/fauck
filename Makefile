@@ -35,7 +35,6 @@ current:
 .PHONY: libfaust
 libfaust:
 	@OS="`uname`"; \
-	echo Handling libfaust download for OS: $$OS; \
 	if echo "$$OS" | grep -qE 'CYGWIN_NT|MINGW32_NT|MINGW64_NT'; then \
 		cd thirdparty/libfaust && cmd /C download_libfaust.bat; \
 	else \
