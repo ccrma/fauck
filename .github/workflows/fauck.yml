@@ -47,6 +47,15 @@ jobs:
       with:
         submodules: true
 
+    - name: Install dependencies Windows
+      if: startsWith(matrix.os, 'windows')
+      shell: cmd
+      run: |
+        cd thirdparty
+        call download_libsndfile.bat
+        cd libfaust
+        call download_libfaust.bat
+
     - name: Install dependencies ubuntu
       if: startsWith(matrix.os, 'ubuntu')
       run: |
