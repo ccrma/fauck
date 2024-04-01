@@ -192,18 +192,36 @@ install (
 )
 endif()
 
-set(SOURCE_DIR "${PACKDIR}/${DST}/Faust.chug")
-if (MSVC)
-    set(DEST_DIR "%USERPROFILE%/Documents/ChucK/chugins/FaucK.chug")
-else()
-    set(DEST_DIR "$ENV{HOME}/.chuck/lib/Faust.chug")
-endif()
-
 # Custom install command to copy the directory
-install(CODE "
+if(MSVC)
+    set(SOURCE_FILE "${PACKDIR}/${DST}/Faust.chug")
+    set(DEST_DIR $ENV{USERPROFILE}/Documents/ChucK/chugins)
+    STRING(REGEX REPLACE "\\\\" "/" DEST_DIR ${DEST_DIR}) 
+    install(CODE "
+    message(\"Copying ${SOURCE_FILE} to ${DEST_DIR}\")
+    file(MAKE_DIRECTORY ${DEST_DIR})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy \"${SOURCE_FILE}\" \"${DEST_DIR}\"
+    )
+    ")
+    set(SOURCE_DIR "${PACKDIR}/${DST}/faust")
+    set(DEST_DIR $ENV{USERPROFILE}/Documents/ChucK/chugins/faust)
+    STRING(REGEX REPLACE "\\\\" "/" DEST_DIR ${DEST_DIR}) 
+    install(CODE "
     message(\"Copying ${SOURCE_DIR} to ${DEST_DIR}\")
     file(MAKE_DIRECTORY ${DEST_DIR})
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E copy_directory \"${SOURCE_DIR}\" \"${DEST_DIR}\"
     )
-")
+    ")
+else()
+    set(SOURCE_DIR "${PACKDIR}/${DST}/Faust.chug")
+    set(DEST_DIR "$ENV{HOME}/.chuck/lib/Faust.chug")
+    install(CODE "
+        message(\"Copying ${SOURCE_DIR} to ${DEST_DIR}\")
+        file(MAKE_DIRECTORY ${DEST_DIR})
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E copy_directory \"${SOURCE_DIR}\" \"${DEST_DIR}\"
+        )
+    ")
+endif()

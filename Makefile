@@ -18,6 +18,8 @@ ifeq ($(UNAME_S), Darwin)
     else
         LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/darwin-x64/Release
     endif
+else ifeq ($(OS),Windows_NT)
+	LIBFAUST_DIR ?= thirdparty/libfaust/win64/Release
 else
     LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/ubuntu-x86_64/Release
 endif
@@ -33,8 +35,8 @@ current:
 .PHONY: libfaust
 libfaust:
 	@OS="`uname`"; \
-	if [ "$$OS" = "Windows_NT" ] || [ "$$OS" = "MINGW32_NT" ] || [ "$$OS" = "MINGW64_NT" ]; then \
-		cd thirdparty/libfaust && call download_libfaust.bat; \
+	if echo "$$OS" | grep -qE 'CYGWIN_NT|MINGW32_NT|MINGW64_NT'; then \
+		cd thirdparty/libfaust && cmd /C download_libfaust.bat; \
 	else \
 		cd thirdparty/libfaust && sh download_libfaust.sh; \
 	fi
@@ -42,8 +44,8 @@ libfaust:
 .PHONY: libsndfile
 libsndfile:
 	@OS="`uname`"; \
-	if [ "$$OS" = "Windows_NT" ] || [ "$$OS" = "MINGW32_NT" ] || [ "$$OS" = "MINGW64_NT" ]; then \
-		cd thirdparty && call download_libsndfile.bat; \
+	if echo "$$OS" | grep -qE 'CYGWIN_NT|MINGW32_NT|MINGW64_NT'; then \
+		cd thirdparty && cmd /C download_libsndfile.bat; \
 	else \
 		cd thirdparty/libsndfile && \
 		cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_OSX_ARCHITECTURES=$(CMAKE_OSX_ARCHITECTURES) -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="./install" && \
@@ -59,7 +61,7 @@ build-debug: libfaust libsndfile
 
 .PHONY: mac osx linux windows win win32 win64
 mac osx linux windows win win32 win64: build-release
-	cmake --build build-release --target install
+	cmake --build build-release --config Release --target install
 
 debug: build-debug
 	cmake --build build-debug

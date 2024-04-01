@@ -65,7 +65,9 @@ Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to th
 make win
 ```
 
-Navigate to the `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`).
+Afterward, the file `Faust.chug` and directory `faust` should be in `%USERPROFILE%/Documents/ChucK/Chugins`.
+
+Navigate to this repository's `package` directory and find the latest `fauck` version such as `fauck-0.0.1`. You should see a file `sndfile.dll`, which you should copy next to wherever `chuck.exe` exists on your computer (likely `C:/Program Files/ChucK/chuck.exe`). 
 
 ## Using FaucK
 
