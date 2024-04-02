@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13.0 FATAL_ERROR)
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
+
 if (DEFINED ENV{FAUCK_VERSION})
 set (VERSION $ENV{FAUCK_VERSION})
 else()
@@ -28,7 +30,6 @@ set(ALL_FILES
     ${CK_SOURCES}
     ${Sources}
 )
-
 
 #######################################
 # faust libraries
@@ -69,7 +70,10 @@ install ( TARGETS FaucK
     ARCHIVE DESTINATION ${PACKDIR}/${DST}
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
 add_compile_options(-fPIC)
 
 if(APPLE)
@@ -93,7 +97,8 @@ install(
 else()
 set_target_properties (${PROJECT_NAME} PROPERTIES 
     SUFFIX ".chug"
-    OUTPUT_NAME Faust)
+    OUTPUT_NAME Faust
+)
 install(
     DIRECTORY ${FAUST_LIBRARIES_DIR}
     DESTINATION ${PACKDIR}/${DST}
@@ -179,7 +184,7 @@ target_include_directories(FaucK PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cheaders/include>
     $<INSTALL_INTERFACE:FaucK> )
 
-if (WIN32)
+if (MSVC)
 ####################################
 # install sndfile
 install (
@@ -187,8 +192,36 @@ install (
 )
 endif()
 
-if (APPLE)
-install (
-    CODE "execute_process (COMMAND codesign --sign - --deep --force ${PACKDIR}/${DST}/Faust.chug)" 
+# Custom install command to copy the directory
+if(MSVC)
+    set(SOURCE_FILE "${PACKDIR}/${DST}/Faust.chug")
+    set(DEST_DIR $ENV{USERPROFILE}/Documents/ChucK/chugins)
+    STRING(REGEX REPLACE "\\\\" "/" DEST_DIR ${DEST_DIR}) 
+    install(CODE "
+    message(\"Copying ${SOURCE_FILE} to ${DEST_DIR}\")
+    file(MAKE_DIRECTORY ${DEST_DIR})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy \"${SOURCE_FILE}\" \"${DEST_DIR}\"
     )
+    ")
+    set(SOURCE_DIR "${PACKDIR}/${DST}/faust")
+    set(DEST_DIR $ENV{USERPROFILE}/Documents/ChucK/chugins/faust)
+    STRING(REGEX REPLACE "\\\\" "/" DEST_DIR ${DEST_DIR}) 
+    install(CODE "
+    message(\"Copying ${SOURCE_DIR} to ${DEST_DIR}\")
+    file(MAKE_DIRECTORY ${DEST_DIR})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy_directory \"${SOURCE_DIR}\" \"${DEST_DIR}\"
+    )
+    ")
+else()
+    set(SOURCE_DIR "${PACKDIR}/${DST}/Faust.chug")
+    set(DEST_DIR "$ENV{HOME}/.chuck/lib/Faust.chug")
+    install(CODE "
+        message(\"Copying ${SOURCE_DIR} to ${DEST_DIR}\")
+        file(MAKE_DIRECTORY ${DEST_DIR})
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E copy_directory \"${SOURCE_DIR}\" \"${DEST_DIR}\"
+        )
+    ")
 endif()

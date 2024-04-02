@@ -2,7 +2,6 @@ name: FaucK
 
 env:
   FAUCK_VERSION: 0.0.3
-  CMAKE_OSX_DEPLOYMENT_TARGET: 12.0
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -24,18 +23,22 @@ jobs:
             os: ubuntu-20.04
             LIBFAUST_DIR: thirdparty/libfaust/ubuntu-x86_64/Release
             CMAKE_OSX_ARCHITECTURES: "x86_64"
+            os-simple: linux
           - name: macos-x86_64
             os: macos-12
             LIBFAUST_DIR: thirdparty/libfaust/darwin-x64/Release
             CMAKE_OSX_ARCHITECTURES: "x86_64"
+            os-simple: mac
           - name: macos-arm64
             os: macos-12
             LIBFAUST_DIR: thirdparty/libfaust/darwin-arm64/Release
             CMAKE_OSX_ARCHITECTURES: "arm64"
+            os-simple: mac
           - name: win64
             os: windows-2022
             LIBFAUST_DIR: thirdparty/libfaust/win64/Release
             CMAKE_OSX_ARCHITECTURES: "x86_64"
+            os-simple: win
 
     runs-on: ${{ matrix.os }}
 
@@ -43,6 +46,15 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+
+    - name: Install dependencies Windows
+      if: startsWith(matrix.os, 'windows')
+      shell: cmd
+      run: |
+        cd thirdparty
+        call download_libsndfile.bat
+        cd libfaust
+        call download_libfaust.bat
 
     - name: Install dependencies ubuntu
       if: startsWith(matrix.os, 'ubuntu')
@@ -78,39 +90,22 @@ jobs:
       run: |
         brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 pkg-config
 
-    - name: Install dependencies Windows
-      if: startsWith(matrix.os, 'windows')
-      run: |
-        cd thirdparty
-        curl -OL https://github.com/libsndfile/libsndfile/releases/download/1.2.0/libsndfile-1.2.0-win64.zip
-        7z x libsndfile-1.2.0-win64.zip -y
-        rm libsndfile-1.2.0-win64.zip
-
-    - name: Download Libfaust Windows
-      if: startsWith(matrix.os, 'windows')
+    - name: Build FaucK Release (Windows)
+      if: ${{ startsWith( matrix.name, 'win') }}
       shell: cmd
       run: |
-        cd thirdparty/libfaust
-        call download_libfaust.bat
-  
-    - name: Download Libfaust macOS/Linux
-      if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
-      run: |
-        cd thirdparty/libfaust && sh download_libfaust.sh
+        make ${{ matrix.os-simple }} 
+      env:
+        CMAKE_OSX_ARCHITECTURES: ${{ matrix.CMAKE_OSX_ARCHITECTURES }}
+        LIBFAUST_DIR: ${{ matrix.LIBFAUST_DIR }}
 
-    - name: Build Libsndfile
-      if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
+    - name: Build FaucK Release (macOS/Linux)
+      if: ${{ ! startsWith( matrix.name, 'win') }}
       run: |
-        cd thirdparty/libsndfile
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }} -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="./install"
-        cmake --build build --config Release
-        cmake --build build --target install
-
-    - name: Build FaucK Release
-      run: |
-        cmake -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_OSX_ARCHITECTURES=${{ matrix.CMAKE_OSX_ARCHITECTURES }} -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET -DLIBFAUST_DIR=${{ github.workspace }}/${{ matrix.LIBFAUST_DIR }}
-        cmake --build build --config Release
-        cmake --build build --config Release --target install
+        make ${{ matrix.os-simple }} 
+      env:
+        CMAKE_OSX_ARCHITECTURES: ${{ matrix.CMAKE_OSX_ARCHITECTURES }}
+        LIBFAUST_DIR: ${{ matrix.LIBFAUST_DIR }}
 
     - uses: actions/upload-artifact@v4
       with:
