@@ -2,6 +2,8 @@
 
 FaucK is a [Chugin](https://github.com/ccrma/chugins) that combines the powerful, succinct [Functional AUdio STream (Faust) language](http://faust.grame.fr) with the strongly-timed [ChucK](http://chuck.stanford.edu) audio programming language. FaucK allows programmers to evaluate Faust code on-the-fly inside ChucK and control Faust signal processors using ChucK’s sample-precise timing and concurrency mechanisms. The goal is to create an amalgam that plays to the strengths of each language, giving rise to new possibilities for rapid prototyping, interaction design and controller mapping, pedagogy, and new ways of working with both Faust and ChucK.
 
+**Compatibility note: FaucK requires ChucK 1.5.2.0 or higher.**
+
 ## Compilation requirements
 
 ### Compilation requirements for all platforms
@@ -32,13 +34,12 @@ libmpg123-dev pkg-config python
 
 ### Windows requirements
 
-* 64-bit Windows, which you are almost certainly using.
 * [7z.exe](https://www.7-zip.org/download.html) must be in your system PATH.
 * You must have Visual Studio 2022 installed (due to Libfaust)
 
 ## Building FaucK
 
-### macOS/Linux
+### macOS
 
 In the root of this repository, run
 
@@ -60,8 +61,8 @@ Afterward, a `Faust.chug` file will appear at `~/.chuck/lib/Faust.chug`. Next, d
 
 ### Windows
 
-Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to this README, and run 
-```bash
+Open an `x64 Native Tools Command Prompt for Visual Studio 2022`, navigate to the root of this repository, and run 
+```cmd
 make win
 ```
 

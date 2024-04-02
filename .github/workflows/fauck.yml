@@ -6,11 +6,16 @@ env:
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      create_release:
+        type: boolean
+        description: Create a draft release
+        default: false
 
   pull_request: {}
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
 
@@ -112,3 +117,20 @@ jobs:
         name: fauck-${{ matrix.name }}.zip
         path: "package/fauck-${{ env.FAUCK_VERSION }}"
         if-no-files-found: error
+
+  create-release:
+    if: ${{ inputs.create_release }} 
+    needs: [build-all-platforms]
+    runs-on: ubuntu-latest
+    name: "Create Release on GitHub"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: "dist"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: "dist/*/*"
