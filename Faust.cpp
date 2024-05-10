@@ -4,12 +4,10 @@
 //
 // authors: Ge Wang (ge@ccrma.stanford.edu)
 //          Romain Michon (rmichon@ccrma.stanford.edu)
-// date: Spring 2016
-// author: David Braun (braun@ccrma.stanford.edu)
-// date: Summer 2022
-//
-// NOTE: be mindful of chuck/chugin compilation, particularly on OSX
-//       compiled for 10.5 chuck may not work well with 10.10 chugin!
+//          David Braun (braun@ccrma.stanford.edu)
+// dates:
+//        - initial implemented by Ge and Roamin in Spring 2016
+//        - FaucK major update by David starting Summer 2022
 //-----------------------------------------------------------------------------
 
 // note that too large of a number can cause weird audio artifacts
@@ -20,7 +18,7 @@
   #define MAX_OUTPUTS 256
 #endif
 
-// this should align with the correct versions of these ChucK files
+// chugin header
 #include <chugin.h>
 
 // general includes
@@ -168,6 +166,12 @@ std::string getPathToFaustLibraries() {
     delete[] char_shareFaustDir;
     return p;
 #elif __APPLE__
+#ifdef NOBUNDLE
+    const char* myDLLPath = getMyDLLPath();
+    std::filesystem::path p = std::filesystem::path(myDLLPath).parent_path().parent_path() / "faust" ;
+    std::cerr << "[Faust]: using library path '" << p << "'" << std::endl;
+    return p.string();
+#else
     // look for faustlibraries inside the bundle
     // OSX only : access to the Faust bundle
     CFBundleRef fauck_bundle = CFBundleGetBundleWithIdentifier(
@@ -182,6 +186,7 @@ std::string getPathToFaustLibraries() {
     std::string resourcePath = std::string((const char*)bundle_path) +
                     std::string("/Contents/Resources/faust");
     return resourcePath;
+#endif
 #else
     // this applies to Linux
     const char* myDLLPath = getMyDLLPath();
@@ -845,13 +850,88 @@ private:
 
 
 //-----------------------------------------------------------------------------
+// name: class Faucktory | v0.2.0 added (ge)
+// desc: a fauck factory for globally keep track of open Faust instances
+//       used as a date structure of "smart pointers" to ensure each is
+//       closed properly; currently, for example, an abrupt closing in
+//       ChucK (e.g., ctrl-c) or application closing (miniAudicle, Max, etc.)
+//       does not cleanup live objects, leading to crashes-on-exit like:
+// ```
+// libc++abi: terminating due to uncaught exception of type
+// std::__1::system_error: recursive_mutex lock failed: Invalid argument
+// zsh: abort
+// ```
+//-----------------------------------------------------------------------------
+class Faucktory
+{
+public:
+    // destructor | to be called on exit
+    ~Faucktory() { cleanup(); }
+
+    // add a Faust object to track
+    void add( Faust * fck )
+    {
+        // insert
+        faucks[fck] = fck;
+    }
+    // remove a Faust object
+    void remove( Faust * fck )
+    {
+        // count
+        if( faucks.count(fck) == 0 ) return;
+        // remove from map
+        faucks.erase( fck );
+    }
+    // cleanup all tracked Faust objects
+    void cleanup()
+    {
+        std::map<Faust *, Faust *>::iterator it;
+        for( it = faucks.begin(); it != faucks.end(); it++ )
+        {
+            // get the pointer
+            Faust * fck = it->second;
+            // clean it up
+            if( fck ) fck->clear();
+        }
+        // clear the map entries
+        faucks.clear();
+    }
+
+public: // singleton API
+    static Faucktory * instance()
+    {
+        // instance
+        if( !o_faucktory ) { o_faucktory = new Faucktory(); }
+        return o_faucktory;
+    }
+
+protected:
+    std::map<Faust *, Faust *> faucks;
+
+private: // enforce singleton
+    Faucktory() { }
+    static Faucktory * o_faucktory;
+};
+
+// static global faucktory | v0.2.0 (ge) added
+Faucktory * Faucktory::o_faucktory = NULL;
+
+// callback to be called on host shutdown (so we can clean up)
+static void cb_on_host_shutdown( void * bindle )
+{
+    // explcitly call cleanup (in case of SIGINT, global object dtors doesn't run)
+    Faucktory::instance()->cleanup();
+}
+
+
+//-----------------------------------------------------------------------------
 // info function: ChucK calls this when loading/probing the chugin
 // NOTE: please customize these info fields below; they will be used for
 // chugins loading, probing, and package management and documentation
 //-----------------------------------------------------------------------------
 CK_DLL_INFO( Faust )
 {
-    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "v0.0.1" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "v0.2.0" );
     QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Ge Wang, Romain Michon, David Braun" );
     QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A chugin which dynamically compiles and executes FAUST code via LLVM." );
     QUERY->setinfo( QUERY, CHUGIN_INFO_URL, "https://github.com/ccrma/fauck" );
@@ -868,7 +948,12 @@ CK_DLL_QUERY( Faust )
 {
     // hmm, don't change this...
     QUERY->setname(QUERY, "Faust");
-    
+
+#if( CK_DLL_VERSION_MAJOR >= 10 && CK_DLL_VERSION_MINOR >= 2 )
+    // register a callback to be called upon host shutdown (so we can clean up)
+    QUERY->register_callback_on_shutdown(QUERY, cb_on_host_shutdown, NULL);
+#endif
+
     // begin the class definition
     // can change the second argument to extend a different ChucK class
     QUERY->begin_class(QUERY, "Faust", "UGen");
@@ -999,6 +1084,9 @@ CK_DLL_CTOR(faust_ctor)
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT(SELF, faust_data_offset) = (t_CKINT) faust_obj;
+
+    // add to global registry
+    Faucktory::instance()->add( faust_obj );
 }
 
 // implementation for the destructor
@@ -1006,6 +1094,9 @@ CK_DLL_DTOR(faust_dtor)
 {
     // get our c++ class pointer
     Faust * faust_obj = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
+
+    // remove from global registry
+    Faucktory::instance()->remove( faust_obj );
 
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( faust_obj );
