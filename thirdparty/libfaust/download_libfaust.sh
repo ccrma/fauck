@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=2.69.3
+VERSION=2.72.14
 
 if [ "$(uname)" = "Darwin" ]; then
     echo "You are running macOS"

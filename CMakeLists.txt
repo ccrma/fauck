@@ -7,7 +7,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
 if (DEFINED ENV{FAUCK_VERSION})
 set (VERSION $ENV{FAUCK_VERSION})
 else()
-set (VERSION "0.2.0")
+set (VERSION "0.0.1")
 endif()
 
 project(FaucK VERSION ${VERSION})
@@ -140,6 +140,10 @@ endif()
 
 unset(FAUST_DIR CACHE)
 unset(LIBFAUST_DIR CACHE)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    FAUCK_VERSION=\"v${VERSION}\"
+)
 
 # Platform-specific libraries and definitions
 if(APPLE)
