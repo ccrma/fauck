@@ -286,11 +286,11 @@ public:
         std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/chuck/")+path;
 
         // TODO: should check if path valid?
-        if( fZoneMap.find(p) == fZoneMap.end() )
+        if ( fZoneMap.find(p) == fZoneMap.end() )
         {
             // error
             std::cerr << "[Faust]: cannot set parameter named: " << path;
-            if( path != p ) std::cerr << " OR " << p << std::endl;
+            if ( path != p ) std::cerr << " OR " << p << std::endl;
             else std::cerr << std::endl;
             return;
         }
@@ -305,7 +305,7 @@ public:
         std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/0x00/")+path;
 
         // TODO: should check if path valid?
-        if( fZoneMap.find(p) == fZoneMap.end() )
+        if ( fZoneMap.find(p) == fZoneMap.end() )
         {
             // error
             std::cerr << "[Faust]: cannot get parameter named: " << path;
@@ -581,16 +581,15 @@ public:
             m_factory = createDSPFactoryFromString("chuck", theCode,
                 argc, argv, target, m_errorString, optimize);
         }
-        
-        if (argv) {
-            for (int i = 0; i < argc; i++) {
-                argv[i] = NULL;
-            }
-            argv = NULL;
+
+        for (int i = 0; i < argc; i++) {
+            argv[i] = NULL;
         }
+        delete[] argv;
+        argv = nullptr;
 
         // check for error
-        if( m_errorString != "")
+        if ( m_errorString != "")
         {
             // output error
             std::cerr << "[Faust]: " << m_errorString << std::endl;
@@ -732,7 +731,7 @@ public:
             return;
         }
         
-        bool needGuiMutex = m_nvoices > 0 && polyphonyIsOn && m_groupVoices;
+        bool needGuiMutex = polyphonyIsOn && m_groupVoices;
                 
         // If polyphony is enabled and we're grouping voices,
         // several voices might share the same parameters in a group.
@@ -746,16 +745,16 @@ public:
             }
         }
         
-        for(int f = 0; f < nframes; f++)
+        for (int f = 0; f < nframes; f++)
         {
-            for(int c = 0; c < m_numInputChannels; c++)
+            for (int c = 0; c < m_numInputChannels; c++)
             {
                 m_input[c][0] = in[f*m_numInputChannels+c];
             }
             
             theDsp->compute( 1, m_input, m_output );
             
-            for(int c = 0; c < m_numOutputChannels; c++)
+            for (int c = 0; c < m_numOutputChannels; c++)
             {
                 out[f*m_numOutputChannels+c] = m_output[c][0];
             }
@@ -919,7 +918,7 @@ Faucktory * Faucktory::o_faucktory = NULL;
 // callback to be called on host shutdown (so we can clean up)
 static void cb_on_host_shutdown( void * bindle )
 {
-    // explcitly call cleanup (in case of SIGINT, global object dtors doesn't run)
+    // explicitly call cleanup (in case of SIGINT, global object dtors doesn't run)
     Faucktory::instance()->cleanup();
 }
 
@@ -931,7 +930,7 @@ static void cb_on_host_shutdown( void * bindle )
 //-----------------------------------------------------------------------------
 CK_DLL_INFO( Faust )
 {
-    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "v0.2.0" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, FAUCK_VERSION);
     QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Ge Wang, Romain Michon, David Braun" );
     QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A chugin which dynamically compiles and executes FAUST code via LLVM." );
     QUERY->setinfo( QUERY, CHUGIN_INFO_URL, "https://github.com/ccrma/fauck" );
@@ -1130,7 +1129,7 @@ CK_DLL_MFUN(faust_eval)
 CK_DLL_MFUN(faust_compile)
 {
     // get our c++ class pointer
-    Faust * f = (Faust *) OBJ_MEMBER_INT(SELF, faust_data_offset);
+    Faust * f = (Faust *)OBJ_MEMBER_INT(SELF, faust_data_offset);
     // get argument
     std::string code = GET_NEXT_STRING_SAFE(ARGS);
     // eval it
