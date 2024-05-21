@@ -22,7 +22,7 @@ ifeq ($(UNAME_S), Darwin)
         LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/darwin-x64/Release
     endif
 else ifeq ($(OS),Windows_NT)
-	LIBFAUST_DIR ?= thirdparty/libfaust/win64/Release
+	LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/win64/Release
 else
     LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/ubuntu-x86_64/Release
 endif
