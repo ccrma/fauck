@@ -7,6 +7,9 @@ CHUGIN_SUFFIX=.chug
 
 CMAKE_OSX_ARCHITECTURES ?= 
 
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+
 # Determine the OS and architecture
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
@@ -14,14 +17,14 @@ UNAME_M := $(shell uname -m)
 # Set LIBFAUST_DIR based on OS and architecture
 ifeq ($(UNAME_S), Darwin)
     ifeq ($(UNAME_M), arm64)
-        LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/darwin-arm64/Release
+        LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/darwin-arm64/Release
     else
-        LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/darwin-x64/Release
+        LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/darwin-x64/Release
     endif
 else ifeq ($(OS),Windows_NT)
-	LIBFAUST_DIR ?= thirdparty/libfaust/win64/Release
+	LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/win64/Release
 else
-    LIBFAUST_DIR ?= $(PWD)/thirdparty/libfaust/ubuntu-x86_64/Release
+    LIBFAUST_DIR ?= $(mkfile_dir)/thirdparty/libfaust/ubuntu-x86_64/Release
 endif
 
 CHUG=$(addsuffix $(CHUGIN_SUFFIX),$(CHUGIN_NAME))
