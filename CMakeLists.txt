@@ -7,7 +7,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
 if (DEFINED ENV{FAUCK_VERSION})
 set (VERSION $ENV{FAUCK_VERSION})
 else()
-set (VERSION "0.0.1")
+set (VERSION "0.3.0")
 endif()
 
 project(FaucK VERSION ${VERSION})
