@@ -41,9 +41,8 @@
 #include <faust/gui/meta.h>
 #include <faust/gui/FUI.h>
 #include <faust/gui/MidiUI.h>
-#include <faust/gui/UI.h>
+#include "faust/gui/APIUI.h"
 #include <faust/gui/PathBuilder.h>
-#include <faust/gui/GUI.h>
 //#include <faust/gui/JSONUI.h>
 #include <faust/gui/SoundUI.h>
 
@@ -202,144 +201,18 @@ std::string getPathToFaustLibraries() {
 // name: class FauckUI
 // desc: Faust ChucK UI -> map of complete hierarchical path and zones
 //-----------------------------------------------------------------------------
-class FauckUI : public UI, public PathBuilder
-{
-protected:
-    // name to pointer map
-    std::map<std::string, FAUSTFLOAT*> fZoneMap;
-    
-    // insert into map
-    void insertMap( std::string label, FAUSTFLOAT * zone )
-    {
-        // map
-        fZoneMap[label] = zone;
-    }
-    
-public:
-    // constructor
-    FauckUI() { }
-    // destructor
-    virtual ~FauckUI() { }
-    
-    // -- widget's layouts
-    void openTabBox(const char* label)
-    {
-        fControlsLevel.push_back(label);
-    }
-    void openHorizontalBox(const char* label)
-    {
-        fControlsLevel.push_back(label);
-    }
-    void openVerticalBox(const char* label)
-    {
-        fControlsLevel.push_back(label);
-    }
-    void closeBox()
-    {
-        fControlsLevel.pop_back();
-    }
-    
-    // -- active widgets
-    void addButton(const char* label, FAUSTFLOAT* zone)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    void addCheckButton(const char* label, FAUSTFLOAT* zone)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT fmin, FAUSTFLOAT fmax, FAUSTFLOAT step)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT fmin, FAUSTFLOAT fmax, FAUSTFLOAT step)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT fmin, FAUSTFLOAT fmax, FAUSTFLOAT step)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    
-    // -- passive widgets
-    void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT fmin, FAUSTFLOAT fmax)
-    {
-        insertMap(buildPath(label), zone);
-    }
-    void addVerticalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT fmin, FAUSTFLOAT fmax)
-    {
-        insertMap(buildPath(label), zone);
-    }
+class FauckUI : public APIUI {
+ public:
 
-    // -- soundfiles
-    void addSoundfile(const char* label, const char* filename, Soundfile** sf_zone)
-    {}
-    
-    // -- metadata declarations
-    void declare(FAUSTFLOAT* zone, const char* key, const char* val)
-    {}
-    
-    // set/get
-    void setValue( const std::string& path, FAUSTFLOAT value )
-    {
-        // append "/chuck/" if necessary
-        std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/chuck/")+path;
+  void dumpParams() {
 
-        // TODO: should check if path valid?
-        if ( fZoneMap.find(p) == fZoneMap.end() )
-        {
-            // error
-            std::cerr << "[Faust]: cannot set parameter named: " << path;
-            if ( path != p ) std::cerr << " OR " << p << std::endl;
-            else std::cerr << std::endl;
-            return;
-        }
-        
-        // set it!
-        *fZoneMap[p] = value;
+    for (auto iter = fItems.begin(); iter != fItems.end(); iter++) {
+      // print
+      std::cerr << iter->fPath
+		  << " : " << iter->fShortname 
+		  << " : " << * (iter->fZone) << std::endl;
     }
-    
-    float getValue(const std::string& path)
-    {
-        // append "/0x00/" if necessary
-        std::string p = path.length() > 0 && path[0] == '/' ? path : std::string("/0x00/")+path;
-
-        // TODO: should check if path valid?
-        if ( fZoneMap.find(p) == fZoneMap.end() )
-        {
-            // error
-            std::cerr << "[Faust]: cannot get parameter named: " << path;
-            if( path != p ) std::cerr << " OR " << p << std::endl;
-            else std::cerr << std::endl;
-            return 0;
-        }
-        
-        return *fZoneMap[path];
-    }
-    
-    void dumpParams()
-    {
-        // iterator
-        std::map<std::string, FAUSTFLOAT*>::iterator iter = fZoneMap.begin();
-        // go
-        for( ; iter != fZoneMap.end(); iter++ )
-        {
-            // print
-            std::cerr << iter->first << " : " << *(iter->second) << std::endl;
-        }
-    }
-    
-    // map access
-    std::map<std::string, FAUSTFLOAT*>& getMap() { return fZoneMap; }
-    // get map size
-    int getParamsCount() { return fZoneMap.size(); }
-    // get param path
-    std::string getParamPath(int index)
-    {
-        std::map<std::string, FAUSTFLOAT*>::iterator it = fZoneMap.begin();
-        while (index-- > 0 && it++ != fZoneMap.end()) {}
-        return (*it).first;
-    }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -549,11 +422,6 @@ public:
 
         argv[argc++] = "-I";
         argv[argc++] = pathToFaustLibraries.c_str();
-
-        //argv[argc++] = "-vec";
-        //argv[argc++] = "-vs";
-        //argv[argc++] = "128";
-        //argv[argc++] = "-dfs";
         
         // save
         m_code = code;
@@ -731,7 +599,9 @@ public:
             return;
         }
         
-        bool needGuiMutex = polyphonyIsOn && m_groupVoices;
+        // note that (m_nvoices > 1) as a condition because (m_nvoices>0) had a bug
+        //  where when m_nvoices was 1, then checkboxes didn't get updated correctly.
+        bool needGuiMutex = m_nvoices > 1 && m_groupVoices;
                 
         // If polyphony is enabled and we're grouping voices,
         // several voices might share the same parameters in a group.
@@ -760,46 +630,27 @@ public:
             }
         }
     }
-    
-    // for Chugins extending UGen
-    /*
-    SAMPLE tick( SAMPLE in )
-    {
-        // sanity check
-        dsp* theDsp = polyphonyIsOn ? m_dsp_poly : m_dsp;
-
-        if( theDsp == NULL ) return 0;
-        
-        // set input
-        for( int i = 0; i < m_numInputChannels; i++ ) m_input[i][0] = in;
-        // zero output
-        for( int i = 0; i < m_numOutputChannels; i++ ) m_output[i][0] = 0;
-        // compute samples
-        theDsp->compute( 1, m_input, m_output );
-        // average output
-        t_CKFLOAT avg = 0;
-        for( int i = 0; i < m_numOutputChannels; i++ ) avg += m_output[i][0];
-        // return sample
-        return avg / m_numOutputChannels;
-    }
-    */
 
     // set parameter example
-    t_CKFLOAT setParam( const std::string & n, t_CKFLOAT p )
+    t_CKFLOAT setParam( const std::string & parname, t_CKFLOAT p )
     {
         // sanity check
         if( !m_ui ) return 0;
 
         // set the value
-        m_ui->setValue( n, p );
+        const char *parname_char = parname.c_str();
+        m_ui->setParamValue( parname_char, p );
         
         // return
         return p;
     }
 
     // get parameter example
-    t_CKFLOAT getParam( const std::string & n )
-    { return m_ui->getValue(n); }
+    t_CKFLOAT getParam( const std::string & parname)
+    { 
+        const char *parname_char = parname.c_str();
+        return m_ui->getParamValue(parname_char);
+    }
     
     // get code
     std::string code() { return m_code; }

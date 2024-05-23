@@ -7,7 +7,13 @@ CHUGIN_SUFFIX=.chug
 
 CMAKE_OSX_ARCHITECTURES ?= 
 
-mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+ifeq ($(OS),Windows_NT)
+  # Running on Windows (Cygwin)
+  mkfile_path := $(shell cygpath -m $(lastword $(MAKEFILE_LIST)))
+else
+  # Running on Unix-like system (including macOS)
+  mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+endif
 mkfile_dir := $(dir $(mkfile_path))
 
 # Determine the OS and architecture

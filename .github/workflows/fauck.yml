@@ -1,7 +1,7 @@
 name: FaucK
 
 env:
-  FAUCK_VERSION: 0.2.0
+  FAUCK_VERSION: 0.3.0
 
 on:
   # Allows you to run this workflow manually from the Actions tab
